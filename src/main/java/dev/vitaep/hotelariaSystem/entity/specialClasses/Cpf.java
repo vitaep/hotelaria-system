@@ -1,6 +1,8 @@
 package dev.vitaep.hotelariaSystem.entity.specialClasses;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import dev.vitaep.hotelariaSystem.exceptions.CpfIsNullException;
+import dev.vitaep.hotelariaSystem.exceptions.InvalidCpfException;
 import jakarta.persistence.Embeddable;
 import lombok.Data;
 
@@ -16,10 +18,10 @@ public class Cpf {
 
     public Cpf(String numero){
         if(!validarCpf(numero)){
-            throw new IllegalArgumentException("CPF Inválido.");
+            throw new InvalidCpfException("O cpf enviado está incorreto ou não existe.");
         }
         if(numero == null){
-            throw new IllegalArgumentException("BAGULHO TA NULL MANO");
+            throw new CpfIsNullException("O cpf enviado não existe.");
         }
 
         this.numero = numero.replaceAll("\\D", "");
