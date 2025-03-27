@@ -3,6 +3,8 @@ package dev.vitaep.hotelariaSystem.service;
 import dev.vitaep.hotelariaSystem.entity.Guest;
 import dev.vitaep.hotelariaSystem.entity.dto.GuestDTO;
 import dev.vitaep.hotelariaSystem.entity.specialClasses.Cpf;
+import dev.vitaep.hotelariaSystem.exceptions.CpfOrEmailAlreadyExistException;
+import dev.vitaep.hotelariaSystem.exceptions.GuestNotFoundException;
 import dev.vitaep.hotelariaSystem.repository.GuestRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -28,7 +30,7 @@ public class GuestService {
 
         var guest = guestRepository.findByCpfOrEmail(new Cpf(guestDTO.cpf()), guestDTO.email());
         if(guest.isPresent()){
-            throw new IllegalArgumentException("TA DUPLICADO PORRA");
+            throw new CpfOrEmailAlreadyExistException("Esse CPF ou Email já existe no sistema.");
         }
 
         return guestRepository.save(guestDTO.toGuest());
@@ -47,7 +49,7 @@ public class GuestService {
 
         Optional<Guest> guest = guestRepository.findById(id);
         if(guest.isEmpty()){
-            throw new EntityNotFoundException("NAO ACHEI A ENTITY PORRA");
+            throw new GuestNotFoundException("O hospede com o ID: " + id + " não foi encontrado.");
         }
 
         return guest.orElse(null);
@@ -59,7 +61,7 @@ public class GuestService {
     public Guest updateGuest(Long id, GuestDTO guestDTO){
 
         Guest existingGuest = guestRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("NAO ACHEI PORRA"));
+                .orElseThrow(() -> new GuestNotFoundException("O hospede com o ID: " + id + " não foi encontrado."));
 
         if(guestDTO.nome() != null && !guestDTO.nome().isEmpty()){
             existingGuest.setNome(guestDTO.nome());
@@ -89,7 +91,7 @@ public class GuestService {
     public void deleteGuest(Long id){
 
         Guest toDelete = guestRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("NAO ACHEI PORRA"));
+                        .orElseThrow(() -> new GuestNotFoundException("O hospede com o ID: " + id + " não foi encontrado."));
 
         guestRepository.deleteById(id);
 
